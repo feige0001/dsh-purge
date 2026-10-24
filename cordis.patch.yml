@@ -28,32 +28,37 @@
   config:
     includeHarnessIdentity: false
     personaPrefix: ""
-    personaSuffix: Your working directory is {{cwd}}.
+    personaSuffix: ""
 
+# 本体 insert 写在用户层 profile/cordis.patch.yml（postinstall 补）。
+# 这里只改已入队条目的 inject/config。再 insert 一次会 already queued（#152 / #154）。
 - id: dsh-purge
   inject: [systemPrompt, tools]
+  config:
+    enabled: true
+    autoApplyOnStart: false
+    autoUpdateOnStart: false
+    autoRevertOnMissing: false
+    injectOnce: false
+    stripMnemon: true
+    verbose: false
+    postPrompt: ""
+    postPromptOrder: 5100
+    autoRetry: true
+    retryMax: 3
+    autoContinue: false
+    continueMax: 3
+    continueText: "继续"
+    capabilityProtocol: true
+    hooksDenyBypass: true
 
 - insert:
+    # 本体。1.1.75 起上游把这行删掉、改由 postinstall 写进 profile 层，
+    # 结果非市场安装（pnpm add / dsh plugin add / 直接换 node_modules）本体不进加载树，
+    # 见上游 issue #158。这里按 1.1.73 的做法恢复自我 insert，与 profile 层不要重复写。
     - id: dsh-purge
       name: 'dsh-purge'
       inject: [systemPrompt, tools]
-      config:
-        enabled: true
-        autoApplyOnStart: false
-        autoUpdateOnStart: false
-        autoRevertOnMissing: false
-        injectOnce: false
-        stripMnemon: true
-        verbose: false
-        postPrompt: ""
-        postPromptOrder: 5100
-        autoRetry: true
-        retryMax: 3
-        autoContinue: false
-        continueMax: 3
-        continueText: "继续"
-        capabilityProtocol: true
-        hooksDenyBypass: true
 
     # 演练台：预设 + 技能落地（本插件 lib/redteam）
     - id: dsh-purge-redteam
